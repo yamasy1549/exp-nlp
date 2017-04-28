@@ -1,51 +1,19 @@
-require 'pry'
-require 'natto'
+require './tf_idf'
 
-class Array
-  def ngram(n)
-    self.each_cons(n).map(&:join)
-  end
-end
-
-class String
-  def wakati
-    nm = Natto::MeCab.new('-S%f[6] -F%f[6] -E\n')
-    nm.enum_parse(self).map do |n|
-      n.feature
-    end
-  end
-end
-
-def tf(frec, all)
-  Rational(frec, all)
-end
-
-def idf(n, df)
-  Math::log2(Rational(n, df)) + 1
-end
-
-def tf_idf(freq, all, n, df)
-  tf(freq, all) * idf(n, df)
-end
-
-word_table = {}
+word_table = WordsTable.new
 source_files = {}
 
 Dir.open(ARGV[1]).each do |file_name|
   next if file_name =~ /^\.+$/
   File.open(File.join(ARGV[1], file_name)) do |file|
     ngram = file.read.wakati.ngram(ARGV[0].to_i)
-    ngram.uniq.each do |name|
-      word_table[name] ||= {}
-      word_table[name][file_name] = ngram.grep(name).count
-    end
+    word_table.collect_words(ngram, file_name)
     source_files[file_name] = ngram.count
     puts "#{file_name} checked"
   end
 end
 
 word_table = word_table.sort
-
 all_file_count = source_files.count
 
 source_files.each do |filename, word_count|
