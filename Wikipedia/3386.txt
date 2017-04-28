@@ -1,0 +1,13 @@
+出典: フリー百科事典『ウィキペディア（Wikipedia）』 移動: ナビゲーション, 検索 m4 は、ブライアン・カーニハンとデニス・リッチーが設計した汎用マクロプロセッサである。その名称は、"macro" が "m" と残り4文字から成ることに由来する。目次 1 使用2 歴史3 機能4 例5 フリーソフトウェア実装6 関連項目7 参考文献8 外部リンク    [編集] 使用マクロプロセッサ（あるいはプリプロセッサ）は、テキスト置換ツールである。主にプログラミングでテキストをテンプレートとして再利用するのに使われるが、文書の編集に使われることもある。[編集] 歴史アセンブリ言語がプログラミングの主流だった頃、マクロプロセッサもよく使われていた。アセンブリ言語で書かれるプログラムは同じテキスト（ニーモニックの並び方）の繰り返しが多い。単純な方法として、テキスト（コードブロック）の再利用が行われるようになった。間もなく、パラメータ（命令のオペランド）を違う値に置換することで、再利用の範囲が広がることがわかってきた。そこで、マクロプロセッサが登場したのである。m4 は1977年、クリストファー・ストレイチーの考えに基づいて開発された。それまでのアセンブリ言語専用のマクロプロセッサと異なり、完全な自由形式のマクロプロセッサであり、高度な拡張性を備えていた（例えば、マクロの引数は走査時と挿入時の2回展開される）。Ratforの最初の実装で使われ、UNIXにも搭載された。今日これを最もよく使っているのはGNUの autoconf である。また、メール転送エージェント sendmail でも設定に使われている。一般に、チューリング完全であることからコード生成に向いているとされるが、デバッグが困難という問題がある。[編集] 機能テキスト置換パラメータ置換ファイルのインクルード文字列操作条件付き評価数式表現システムインタフェースプログラマ診断 それ以前のマクロプロセッサとは異なり、特定のコンピュータ言語や自然言語を対象としたものではない。ただし、本来はFORTRANの方言であるRatforの開発で使うためのものだった。他のマクロプロセッサとは異なり、m4 は一般的なプログラミング言語と同様、チューリング完全である。[編集] 例以下のコード断片はHTML生成ライブラリの一部を示したものである。自動的に節見出しに番号を振るマクロを定義している。
+define(`H2_COUNT', 0)
+define(`H2', `define(`H2_COUNT', incr(H2_COUNT))' dnl
+  `<h2>H2_COUNT. $1</h2>')
+
+H2(First Section)
+H2(Second Section)
+H2(Conclusion)
+m4 でこれを処理すると、次のようなテキストが生成される。
+<h2>1. First Section</h2>
+<h2>2. Second Section</h2>
+<h2>3. Conclusion</h2>
+[編集] フリーソフトウェア実装GNU版のm4が存在する。FreeBSD、NetBSD、OpenBSD にも m4 の独自の実装が存在する。さらに OpenSolaris から派生した Heirloom Project でも m4 のフリー版が存在する。Windows版もある。[編集] 関連項目CプリプロセッサプリプロセッサMakePHP [編集] 参考文献Brian W. Kernighan and Dennis M. Ritchie. The M4 macro processor. Technical report, Bell Laboratories, Murray Hill, New Jersey, USA, 1977. pdfKenneth J. Turner. Exploiting the m4 macro language. Technical Report CSM-126, Department of Computing Science and Mathematics, University of Stirling, Scotland, September 1994.Ren Seindal. GNU M4 Manual. GNU Press. 2004. [1] [編集] 外部リンクGNU M4 websiteM4 tutorial  「http://ja.wikipedia.org/wiki/M4_(%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%9F%E3%83%B3%E3%82%B0%E8%A8%80%E8%AA%9E)」より作成カテゴリ: コンピュータ言語 

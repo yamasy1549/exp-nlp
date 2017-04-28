@@ -1,0 +1,13 @@
+出典: フリー百科事典『ウィキペディア（Wikipedia）』 移動: ナビゲーション, 検索 Boo  パラダイムオブジェクト指向 登場時期2003年 設計者Rodrigo B. De Oliveira 開発者Rodrigo B. De Oliveira 最新リリース0.9.3(2009-12-28) 型付け静的型付け, 強い型付け, ダック・タイピング 影響を受けた言語Python プラットフォーム.NET Framework, Mono ライセンスMIT/BSD ウェブサイトboo.codehaus.org ・話・編・歴 Boo はオブジェクト指向で静的型付けのプログラミング言語であり、共通言語基盤を通してUnicodeや国際化と地域化をサポートしている。ウェブアプリケーションも開発可能であり、Pythonに影響を受けた文法構造を持つ。[1]そして言語やコンパイラの拡張性に重点が置かれている。特筆すべき機能を幾つか挙げてみると、型推論, ジェネレータ, 多重ディスパッチ、および付加的なダックタイピング、マクロ、真のクロージャ、カリー化、第一級関数(英語:first-class function)などがある。Boo言語は2003年から活発に開発が行われている。Boo言語の処理系はフリーソフトウェアであり、MITライセンス/BSDライセンスで配布されている。そしてマイクロソフト .NETおよびMonoの両方で動作する。またオープンソースによる統合開発環境であるSharpDevelopやMonoDevelopでは、Boo言語による開発を標準でサポートしている。[2]目次 1 サンプルコード1.1 Hello worldプログラム1.2 フィボナッチ数列生成関数  2 関連項目3 参照4 外部リンク    [編集] サンプルコード[編集] Hello worldプログラムBoo言語による Hello, World! プログラムは次のようになる。
+print "Hello, World!"
+ [編集] フィボナッチ数列生成関数
+def fib():
+    a, b = 0L, 1L       #「L」が付いた数は64ビットになる。
+    while true:
+        yield b
+        a, b = b, a + b
+ 
+# 数列の最初の5つの数を出力する。
+for index as int, element in zip(range(5), fib()):
+    print("${index+1}: ${element}")
+ [編集] 関連項目Free Software Portal Logo.svgウィキポータルree software  FantomGroovyIronPythonIronRubyNemerleREBOLプログラミング言語 [編集] 参照^ Rodrigo Barreto de Oliveira (2005). "The boo Programming Language" (PDF). February 22, 2009閲覧。^ Christoph Wille - christophw@icsharpcode.net. "SharpDevelop @ic#code". 2010年7月9日閲覧。 [編集] 外部リンクBoo言語 公式ウェブサイトBooLangStudio VSIP for Visual Studio 2008#develop free IDE for C#, VB.NET and Boo projects on Microsoft's .NET platformBoo syntax highlighting for Visual Studio 2010Mython 表・話・編・歴 .NET Framework（カテゴリ）  アーキテクチャ共通言語基盤 - アセンブリ - メタデータ - 基本クラスライブラリ   共通言語基盤共通言語ランタイム - 共通型システム - 共通中間言語 - 動的言語ランタイム   言語C# - Visual Basic .NET - C++/CLI （マネージ拡張） - F# - J# - JScript .NET - Windows PowerShell - IronPython - IronRuby - Nemerle - Boo   関連技術WPF - WCF - WF - WCS - Windows Forms - ASP.NET - ADO.NET- ASP.NET MVC Framework - ClickOnce - XAML - Silverlight - LINQ - .NET Remoting   その他のCLI実装シェアードソースCLI - Mono - Portable.NET - .NET Compact Framework - Microsoft XNA   比較記事C#とJava       「http://ja.wikipedia.org/wiki/Boo_(%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%9F%E3%83%B3%E3%82%B0%E8%A8%80%E8%AA%9E)」より作成カテゴリ: プログラミング言語 | .NET Framework | オブジェクト指向言語 

@@ -1,0 +1,190 @@
+出典: フリー百科事典『ウィキペディア（Wikipedia）』 移動: ナビゲーション, 検索 ソケット（英: Socket）とは、BSD系UNIXを起源とするAPIであり、C言語によるアプリケーション開発でのプロセス間通信、特にコンピュータネットワークに関するライブラリを構成する。BSDソケット、バークレーソケットなどとも呼ばれる。1983年にリリースされたUNIXオペレーティングシステム(OS) 4.2BSD で初めて API として実装された。ネットワークの抽象化インタフェースとしてのデファクトスタンダードとなっている。本来のソケットAPIはC言語を対象とするが、他のプログラミング言語でも類似のインタフェースを採用しているものが多い。ソケットの代替となるAPIとして、STREAMSベースの Transport Layer Interface (TLI) がある。しかし、BSDソケットは比較にならないほど普及しており、数多くの実装が存在する。目次 1 BSDソケットインタフェース2 ヘッダファイル3 TCP3.1 サーバ3.2 クライアント  4 UDP4.1 サーバ4.2 クライアント  5 関数5.1 socket()5.2 gethostbyname() と gethostbyaddr()5.3 connect()5.4 bind()5.5 listen()5.6 accept()  6 ブロッキングとノンブロッキング7 注意点8 関連項目9 参考文献10 外部リンク    [編集] BSDソケットインタフェースBSDソケットは、ホスト間の通信や1つのコンピュータ上のプロセス間の通信を可能とする。通信媒体としては様々な入出力機器やデバイスドライバを利用可能だが、その部分はオペレーティングシステムの実装に依存する。このインタフェース実装はTCP/IPを利用する場合にはほぼ必ず必要とされ、インターネットを支える基盤技術の一つとなっている。当初、カリフォルニア大学バークレー校でUNIX向けに開発された。最近の全てのオペレーティングシステムには間違いなくBSDソケットが何らかの形で実装されており、インターネットへの接続の標準インタフェースとなっている。プログラマの観点から見ると、ソケットインタフェースは3つのレベルでアクセス可能である。最も強力で基本的なレベルは RAW（生）ソケットレベルである。RAWソケットが可能とする通信制御の自由度を必要とするアプリケーションは稀であり、インターネット関連技術の開発でのみ使われるべきとされている。しかし、近年では Windows XP も含めて多くのOSでそれがサポートされている。[編集] ヘッダファイルBSDソケットにはいくつかのヘッダファイルがある。<sys/socket.h>BSDソケットの中核となる関数とデータ構造<netinet/in.h>AF_INET と AF_INET6 アドレスファミリ。インターネット上で広く使われ、IPアドレスとTCP/UDPのポート番号が含まれる。<sys/un.h>AF_UNIX アドレスファミリ。同一コンピュータ上で動作するプログラム間のローカルな通信に使用。ネットワーク上では使われない。<arpa/inet.h>数値としてIPアドレスを操作する機能の定義<netdb.h>プロトコル名とホスト名を数値アドレスに変換する機能の定義。ローカルなデータやDNSを検索する。   [編集] TCPTCP はコネクションの概念を提供する。TCPソケットを生成するには socket() 関数で PF_INET または PF_INET6 と SOCK_STREAM を引数に指定する。[編集] サーバ単純なTCPサーバの設定は、以下のように行われる。TCPソケットを生成（socket()呼び出し）そのソケットを listen（コネクション確立要求待ちうけ）ポートにバインド（bind()呼び出し）。bind() を呼び出す前に、sockaddr_in 構造体を宣言し、その中身をクリアし（bzero() または memset()）、その sin_family フィールドを AF_INET か AF_INET6 に設定し、sin_port フィールドに listen 対象ポート番号をネットワークバイトオーダで設定する。short int をネットワークバイトオーダに変換するには、htons() 関数を使う。そのソケットをコネクションの listen に使用するため、listen() を呼び出す。入ってきたコネクションを accept() 呼び出しで受け付ける。これはコネクションが受信されるまでブロックし、受信したコネクションのソケット記述子を返す。最初の記述子は listen 用記述子のままであり、accept() はそのソケットをクローズするまで何度でも呼び出せる。遠隔のホストと通信を行う。send()とrecv()、またはwrite()とread()を使用する。不要になったら、close() を使ってオープンされた各ソケットをクローズする。なお、fork() が行われた場合、各プロセスは見えているソケットを全てクローズしなければならず、複数のプロセスが同じソケットを同時に使ってはならない。 
+  // Server code in C
+ 
+  #include <sys/types.h>
+  #include <sys/socket.h>
+  #include <netinet/in.h>
+  #include <arpa/inet.h>
+  #include <stdio.h>
+  #include <stdlib.h>
+  #include <strings.h>
+ 
+  int main()
+  {
+    int32_t i32SocketFD = socket(AF_INET, SOCK_STREAM, 0);
+ 
+    if(0 == i32SocketFD)
+    {
+      printf("can not create socket");
+      exit(-1);
+    }
+ 
+    struct sockaddr_in stSockAddr;
+    memset(&stSockAddr, 0, sizeof(stSockAddr));
+ 
+    stSockAddr.sin_family = AF_INET;
+    stSockAddr.sin_port = htons(1100);
+    stSockAddr.sin_addr.s_addr = htonl(INADDR_ANY);
+ 
+    if(-1 == bind(i32SocketFD,(struct sockaddr*) &stSockAddr, sizeof(stSockAddr)))
+    {
+      printf("error bind failed");
+      exit(-1);
+    }
+ 
+    if(-1 == listen(i32SocketFD, 10))
+    {
+      printf("error listen failed");
+      exit(-1);
+    }
+ 
+    for(; ;)
+    {
+      int32_t i32ConnectFD = accept(i32SocketFD, NULL, NULL);
+ 
+      if(0 > i32ConnectFD)
+      {
+        printf("error accept failed");
+        exit(-1);
+      }
+ 
+     // ここで実際の通信を行う
+ 
+      shutdown(i32ConnectFD, 2);
+ 
+      close(i32ConnectFD);
+    }
+    return 0;
+  }
+ [編集] クライアントTCPクライアントの設定は、以下のように行われる。TCPソケットを生成する（socket()呼び出し）connect() でサーバに接続する。このとき、sockaddr_in 構造体の sin_family フィールドは AF_INET か AF_INET6 とし、sin_port には通信相手が listen しているはずのポート番号をネットワークバイトオーダで設定し、sin_addr にもネットワークバイトオーダで相手の（IPv4 か IPv6 の）アドレスを設定する。サーバと通信する。send()とrecv()、またはwrite()とread()を使用する。コネクションの終了と削除処理を close() で行う。なお、fork() が行われた場合、各プロセスは見えているソケットを全てクローズしなければならず、複数のプロセスが同じソケットを同時に使ってはならない。 
+  // Client code in C
+ 
+  #include <sys/types.h>
+  #include <sys/socket.h>
+  #include <netinet/in.h>
+  #include <arpa/inet.h>
+  #include <stdio.h>
+  #include <stdlib.h>
+  #include <strings.h>
+ 
+  int main()
+  {
+    int32_t i32SocketFD = socket(AF_INET, SOCK_STREAM, 0);
+ 
+    if(0 == i32SocketFD)
+    {
+      printf("cannot create socket");
+      exit(-1);
+    }
+ 
+    struct sockaddr_in stSockAddr;
+    memset(&stSockAddr, 0, sizeof(stSockAddr));
+ 
+    stSockAddr.sin_family = AF_INET;
+    stSockAddr.sin_port = htons(1101);
+    int32_t i32Res = inet_pton(AF_INET, "192.168.1.3",
+        (void *) &stSockAddr.sin_addr);
+ 
+    if(0 > i32Res)
+    {
+      printf("error: first parameter is not a valid address family");
+      exit(-1);
+    }
+    else if(0 == i32Res)
+    {
+      printf("char string (second parameter does not contain valid ipaddress");
+      exit(-1);
+    }
+    if(-1 == connect(i32SocketFD,(struct sockaddr*) &stSockAddr, sizeof(stSockAddr)))
+    {
+      printf("connect failed");
+      exit(-1);
+    }
+ 
+    // ここで実際の通信を行う。
+ 
+    shutdown(i32SocketFD, 2);
+ 
+    close(i32SocketFD);
+ 
+    return 0;
+  }
+ [編集] UDPUDP はコネクションレスのプロトコルであり、パケットが必ず相手に届くことは保証されない。UDPパケットは順序通りに届くとは限らず、1つのパケットが複数個届くこともありうるし、全く届かないこともある。このようにほとんど何も保証されないため、UDP は TCP に比べて非常にオーバヘッドが小さい。コネクションレスであるとは、2つのホスト間にコネクションやストリームといったものがなく、データが単に個々のパケット（datagram）として届けられることを意味している。UDP のアドレス空間、すなわちUDPポート番号は、TCPポートとは完全に別物である。[編集] サーバ以下のコードは、ポート番号 7654 でUDPサーバを設定するものである。
+ sock = socket(PF_INET,SOCK_DGRAM,IPPROTO_IP); 
+ 
+ sa.sin_addr.s_addr = INADDR_ANY;
+ sa.sin_port = htons(7654);
+ 
+ bound = bind(sock,(struct sockaddr *)&sa, sizeof(struct sockaddr));
+ if (bound < 0)
+     fprintf(stderr, "bind(): %s\n",strerror(errno));
+ bind() は、ソケットとアドレス/ポートを結びつける。
+ while (1) {
+     printf ("recv test....\n");
+     recsize = recvfrom(sock, (void *)Hz, 100, 0, (struct sockaddr *)&sa, fromlen);
+     printf ("recsize: %d\n ",recsize);
+     if (recsize < 0)
+         fprintf(stderr, "%s\n", strerror(errno));
+     sleep(1);
+     printf("datagram: %s\n",Hz);
+ }
+ この無限ループは recvfrom() を使ってポート番号 7654 からのUDPパケットを受信する。引数は以下の通り。ソケットバッファへのポインタバッファの大きさフラグ（read などの他のソケット受信関数と同じ）アドレス構造体アドレス構造体の大きさ [編集] クライアント以下のコードは、ポート 7654、アドレス 127.0.0.1 に "Hello World!" という内容のUDPパケットを送るものである。
+ #include <stdio.h>
+ #include <errno.h>
+ #include <string.h>
+ #include <sys/socket.h>
+ #include <sys/types.h>
+ #include <netinet/in.h>
+ #include <unistd.h>//for close() for socket
+ 
+ int main(int argc, char *argv[])
+ {
+   int sock;
+   struct sockaddr_in sa;
+   int bytes_sent, buffer_length;
+   char buffer[200];
+ 
+   sprintf(buffer, "Hello World!");
+   buffer_length = strlen(buffer) + 1;
+ 
+   sock = socket(PF_INET, SOCK_DGRAM, IPPROTO_IP);
+   if(-1 == sock)//if socket failed to initialize, exit
+   {
+      printf("Error Creating Socket");
+      return 0;
+   }
+ 
+   sa.sin_family = AF_INET;
+   sa.sin_addr.s_addr = htonl(0x7F000001);
+   sa.sin_port = htons(7654);
+ 
+   bytes_sent = sendto(sock, buffer, buffer_length, 0,(struct sockaddr*) &sa, sizeof(struct sockaddr_in) );
+   if(bytes_sent < 0)
+     printf("Error sending packet: %s\n", strerror(errno) );
+ 
+   close(sock);//close the socket
+   return 0;
+ }
+ このコードでは、buffer が送信すべきデータへのポインタ、buffer_length がその中身の大きさとなっている。[編集] 関数[編集] socket()socket() は通信の一方の終端を作成し、それを表すファイル記述子を返す。socket() には以下の3つの引数がある。domain - 生成するソケットのプロトコルファミリを指定する。 PF_INET - IPv4PF_INET6 - IPv6  type - ソケットのタイプ指定。 SOCK_STREAM - 信頼性のあるストリーム指向サービス（TCPに対応）SOCK_DGRAM - データグラムサービス（UDPに対応）SOCK_SEQPACKET - SOCK_STREAMとほぼ同じだが、受信したパケットを読み出す際にパケット全体を読み出さないと、残りを破棄する。SOCK_RAW - IPレベルのプロトコル処理をユーザー側で用意するときに使用  protocol - 通常 IPPROTO_IP を指定。トランスポート層のプロトコルは、domain と type で指定されるが（TCPの場合、PF_INET または PF_INET6 と SOCK_STREAM、UDPの場合、同様の PF_ 値と SOCK_DGRAM）、明示的に指定することも可能で、その値は <netinet/in.h> に定義されている。 エラーが発生すると -1 を返す。そうでない場合、新たに確保された記述子を表す整数を返す。
+# include <sys/types.h>
+# include <sys/socket.h>
+int socket(int domain, int type, int protocol);
+ [編集] gethostbyname() と gethostbyaddr()gethostbyname() と gethostbyaddr() は名前やアドレスで指定されたインターネット上のホストを表す struct hostent というデータ構造へのポインタを返す。その中には、ネームサーバから得られた情報、/etc/hosts ファイルから得られた情報などが格納されている。ローカルにネームサーバが動作していない場合、/etc/hosts ファイルを参照する。以下の引数がある。name - ホスト名を指定。例えば "www.wikipedia.org"addr - struct in_addr へのポインタ。中身としてホストのアドレスを指定。len - addr の長さをバイト数で指定。type - アドレスのドメイン型を指定。例えば、AF_INET エラーが発生するとNULLポインタを返し、h_errno を見れば詳しいエラーの原因（再試行すべきか否か）がわかる。そうでない場合、有効な struct hostent * が返される。
+struct hostent *gethostbyname(const char *name);
+struct hostent *gethostbyaddr(const void *addr, int len, int type);
+ [編集] connect()connect() はコネクションの確立に成功すると 0 を返し、エラーが発生すると -1 を返す。コネクションレスのソケットの場合（User Datagram Protocol）、connect() は送受信の相手を指定するのに使われ、send() と recv() をコネクションレスのソケットで使えるようになる。
+# include <sys/types.h>
+# include <sys/socket.h>
+int connect(int sockfd, const struct sockaddr *serv_addr, socklen_t addrlen);
+ [編集] bind()bind() はソケットにアドレスを設定する。socket() で生成された時点では、ソケットはアドレスファミリは指定されているが、アドレスは設定されていない。ソケットは、コネクションを受け付ける前にバインド（アドレス設定）される必要がある。以下の引数がある。sockfd - バインドすべきソケットの記述子serv_addr - バインドすべきアドレスを表す sockaddr 構造体へのポインタaddrlen - sockaddr 構造体の大きさ 成功すると 0 を返し、エラーが発生すると -1 を返す。
+# include <sys/types.h>
+# include <sys/socket.h>
+int bind(int sockfd, struct sockaddr *my_addr, socklen_t addrlen);
+ [編集] listen()listen() はバインドされたソケットでコネクション確立要求を待ち受ける。SOCK_STREAM または SOCK_SEQPACKET の場合のみ有効。以下の引数がある。sockfd - ソケット記述子backlog - ある時点でペンディングにできる（キューイングできる）最大コネクション数。一般にOSが上限を設けている。 コネクションは accept() されるとデキューされる。成功すると 0 を返す。エラーが発生すると -1 を返す。
+# include <sys/socket.h>
+int listen(int sockfd, int backlog);
+ [編集] accept()accept() は、リモートホストからのコネクション確立要求を受け付ける。以下の引数がある。sockfd - listen していたソケットの記述子cliaddr - クライアントのアドレス情報を accept() の中で格納するための sockaddr 構造体へのポインタaddrlen - cliaddr が指す sockaddr 構造体の大きさを格納する socklen_t へのポインタ。accept() から戻ったとき、実際に格納されたデータ構造のサイズに更新されている。 コネクションが確立された場合、それに対応したソケット記述子を返す。エラーが発生すると -1 を返す。
+# include <sys/types.h>
+# include <sys/socket.h>
+int accept(int sockfd, struct sockaddr *cliaddr, socklen_t *addrlen);
+ [編集] ブロッキングとノンブロッキングBSDソケットは、ブロッキングとノンブロッキングという2つのモードを持つ。ブロッキング・ソケットは指定されたデータを全て送受信し終わるまで呼び出したライブラリ関数から戻ってこない。これは、ソケットで listen を続けたい場合に困ったことになる。プログラムは決して届かないデータを待って動けなくなる可能性がある。ブロッキングかノンブロッキングかを指定するには、fcntl() か ioctl() 関数を使う。[編集] 注意点socket() で確保されたリソースは close() を使うまで解放されない。これは、connect() が成功するまで再試行を繰り返すような実装で注意が必要となる。socket() を呼び出したら必ず対応する close() を呼び出す必要がある。close を使うには <unistd.h> をインクルードする必要がある。[編集] 関連項目コンピュータネットワークWinsock [編集] 参考文献ソケットインタフェースの正当な標準定義は以下の POSIX 標準に含まれている。IEEE Std. 1003.1-2001 Standard for Information Technology -- Portable Operating System Interface (POSIX).Open Group Technical Standard: Base Specifications, Issue 6, December 2001.ISO/IEC 9945:2002 この標準に関する情報と現在進行の作業については、the Austin website にある。ソケットAPIのIPv6拡張は、RFC 3493 と RFC 3542 にある。この記述は GNU Free Documentation License のもとに公開されているコンピュータ用語辞典『 Free On-line Dictionary of Computing (FOLDOC) 』に基づいています。[編集] 外部リンクaccept(2)connect(2)Beej's Guide to Network ProgrammingUnixSocket FAQPorting Berkley Socket programs to Winsock  「http://ja.wikipedia.org/wiki/%E3%82%BD%E3%82%B1%E3%83%83%E3%83%88_(BSD)」より作成カテゴリ: ネットワークソフト | Application Programming Interface | UNIXのシステムコール | BSD隠しカテゴリ: FOLDOCを情報源とする記事 

@@ -1,0 +1,15 @@
+出典: フリー百科事典『ウィキペディア（Wikipedia）』 移動: ナビゲーション, 検索 GUID (Globally Unique Identifier)またはグローバル一意識別子（ぐろーばるいちいしきべつし）は、ソフトウェアで使用される擬似乱数で、世界で一意な識別子として使用される128ビットの2進数値である。ただし、絶対に一意であることを保証するものではなく、生成される識別子の数が(2128 つまり 3.40282366×1038) と非常に大きいため、同じ識別子が生成される確率がきわめて小さいということである。GUIDは『グーイッド』と発音するGUIDという用語は一般に、UUID（Universally Unique IDentifier）のマイクロソフト社での実装を指して言うが、オラクル社のデータベースやノベルのeDirectory（ディレクトリ・サービス）をはじめとする多くのソフトウェアでこの用語が使用されている。GUIDを生成するツールとして、Microsoft Windows SDKに付属するGuidGenなどがある。目次 1 構造2 テキスト表記3 使用例4 外部リンク    [編集] 構造GUID は16バイト(128ビット)の2進数値で、以下のような構造体で表現される。
+GUID STRUCT
+ Data1 dd
+ Data2 dw
+ Data3 dw
+ Data4 db 8
+GUID ENDS
+guiddef.h におけるGUIDの定義は以下のとおり。
+typedef struct _GUID {
+    unsigned long  Data1;
+    unsigned short Data2;
+    unsigned short Data3;
+    unsigned char  Data4[8];
+} GUID;
+[編集] テキスト表記GUIDは一般に以下のような16進表記が行われている。3F2504E0-4F89-11D3-9A0C-0305E82C3301 このテキスト表記は以下のような32桁の構造を持つ。Data1 (8桁)ハイフンData2 (4桁)ハイフンData3 (4桁)ハイフンData4 の最初の2アイテム(4桁)ハイフンData4 の残りの6アイテム(12桁) 波括弧(ブレース)で囲んで表記することも多い。{3F2504E0-4F89-11D3-9A0C-0305E82C3301} [編集] 使用例COMで用いられているオブジェクト識別のためのクラスID、インターフェイスIDなど。 [編集] 外部リンクMicrosoft,GuidGenのダウンロードサイトGuidGen この「GUID」はコンピュータに関連した書きかけ項目です。この記事を加筆して下さる協力者を求めています（PJ コンピュータ / Portal:コンピュータ）。    「http://ja.wikipedia.org/wiki/GUID」より作成カテゴリ: 識別子隠しカテゴリ: コンピュータ関連のスタブ項目 
