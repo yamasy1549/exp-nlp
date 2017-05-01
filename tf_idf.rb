@@ -12,15 +12,19 @@ class String
   end
 
   def wakati
-    nm = Natto::MeCab.new('-S%f[6] -F%f[6] -E\n')
-    nm.enum_parse(self).map do |n|
+    # -E で何か指定しなきゃいけない
+    nm = Natto::MeCab.new('-S%f[6] -F%f[6] -E"')
+    wakati_array = 
+      nm.enum_parse(self).map do |n|
       n.feature
-    end
+      end
+    wakati_array.delete("\"") # EOFを消す
+    wakati_array
   end
 end
 
-def tf(frec, all)
-  Rational(frec, all)
+def tf(freq, all)
+  Rational(freq, all)
 end
 
 def idf(n, df)
