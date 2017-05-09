@@ -1,12 +1,13 @@
 require './tf_idf'
 
+pos = ["名詞", "動詞", "形容詞", "形容動詞", "副詞"]
 word_table = WordsTable.new
 source_files = {}
 
 Dir.open(ARGV[1]).each do |file_name|
   next if file_name =~ /^\.+$/
   File.open(File.join(ARGV[1], file_name)) do |file|
-    ngram = file.read.chomp.wakati.ngram(ARGV[0].to_i)
+    ngram = file.read.chomp.remove_url.wakati(pos).ngram(ARGV[0].to_i)
     word_table.collect_words(ngram, file_name)
     source_files[file_name] = ngram.count
     puts "#{file_name} checked"
@@ -22,7 +23,8 @@ source_files.each do |filename, word_count|
     freq = word_count_in[filename]
     df = word_count_in.count
     if freq && word_count && all_file_count && df
-      words_tf_idf << "#{name}\t#{tf_idf(freq, word_count, all_file_count, df)}"
+      tf_idf = tf_idf(freq, word_count, all_file_count, df)
+      words_tf_idf << "#{name}\t#{tf_idf}" if tf_idf > 0.02
     end
   end
   File.open(File.join(ARGV[2], "#{filename}-#{ARGV[0]}gram"), 'w') do |file|

@@ -1,3 +1,5 @@
+require 'pry'
+require 'uri'
 require 'natto'
 
 class Array
@@ -11,15 +13,34 @@ class String
     self.split('').each_cons(n).map(&:join)
   end
 
-  def wakati
-    # -E で何か指定しなきゃいけない
-    nm = Natto::MeCab.new('-S%f[6] -F%f[6] -E"')
+  def wakati(pos)
+    nm = Natto::MeCab.new('-S%f[6] -F%f[0] -E"') # -E で何か指定しなきゃいけない
     wakati_array = 
       nm.enum_parse(self).map do |n|
-      n.feature
+        if pos
+          pos.include?(n.feature) ? n.surface : nil
+        else
+          n.surface
+        end
       end
-    wakati_array.delete("\"") # EOFを消す
+    wakati_array.compact!.delete("\"") # EOFを消す
     wakati_array
+  end
+
+  def remove_url
+    self.gsub(URI.regexp, '')
+  end
+
+  def remove_symbols
+    self
+    pos = ["記号"]
+    nm = Natto::MeCab.new('-S%f[6] -F%f[0] -E"')
+    wakati_array = 
+      nm.enum_parse(self).map do |n|
+        pos.include?(n.feature) ? nil : n.surface
+      end
+    wakati_array.compact!.delete("\"") # EOFを消す
+    wakati_array.join('')
   end
 end
 
