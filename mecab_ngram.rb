@@ -1,6 +1,6 @@
 require './tf_idf'
 
-pos = ["名詞", "動詞", "形容詞", "形容動詞", "副詞"]
+pos = ["名詞", "動詞", "形容詞", "副詞", "感動詞"]
 word_table = WordsTable.new
 source_files = {}
 
