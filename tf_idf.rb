@@ -32,7 +32,10 @@ class String
   end
 
   def remove_symbols
-    self.gsub(/[\n\[\]:;!"#&'()*+,-.\/<=\?^{\|}°×δζημν—“”…‰′″※↑→↓⇒⇔−∞■□○●★☆　、。〈〉《》「」『』【】〒〔〕〜ノ・！＆（）＊＋／：；＝？［］]/, '')
+    nm = Natto::MeCab.new('-S%f[6] -F%f[0] -E"') # -E で何か指定しなきゃいけない
+    nm.enum_parse(self).map do |n|
+      n.surface if n.char_type != 3
+    end.compact!.join('')
   end
 end
 
