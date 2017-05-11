@@ -32,15 +32,7 @@ class String
   end
 
   def remove_symbols
-    self
-    pos = ["記号"]
-    nm = Natto::MeCab.new('-S%f[6] -F%f[0] -E"')
-    wakati_array = 
-      nm.enum_parse(self).map do |n|
-        pos.include?(n.feature) ? nil : n.surface
-      end
-    wakati_array.compact!.delete("\"") # EOFを消す
-    wakati_array.join('')
+    self.gsub(/[\n\[\]:;!"#&'()*+,-.\/<=\?^{\|}°×δζημν—“”…‰′″※↑→↓⇒⇔−∞■□○●★☆　、。〈〉《》「」『』【】〒〔〕〜ノ・！＆（）＊＋／：；＝？［］]/, '')
   end
 end
 
