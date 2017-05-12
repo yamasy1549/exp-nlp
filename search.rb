@@ -22,6 +22,33 @@ def search_and(search_words, dirname)
   end.inject(&:&)
 end
 
-puts search_and(ARGV[1..-1], ARGV[0])
+def prioritize(files)
+  file_tf_idf = {}
+  dirs = ['./result-character-removed', './result-word-removed']
+
+  files.each do |data_file|
+    dirs.each do |dir|
+      Dir.open(dir).each do |file_name|
+        next unless file_name =~ /#{data_file}(.*)gram/
+        File.open(File.join(dir, file_name)) do |file|
+          file.read.split("\n").each do |word|
+            match = word.match(/(.*)\t(.*)/)
+            if ARGV[1..-1].include?(match[1])
+              file_tf_idf[data_file] = 0 unless file_tf_idf[data_file]
+              file_tf_idf[data_file] += match[2].to_f
+            end
+          end
+        end
+      end
+    end
+  end
+
+  # Hash[file_tf_idf.sort_by{ |_, v| -v }]
+  Hash[file_tf_idf.sort_by{ |_, v| -v }].map{ |k, _| k }
+end
+
+search_result = search_or(ARGV[1..-1], ARGV[0])
+search_result = search_and(ARGV[1..-1], ARGV[0])
+puts prioritize(search_result)
 
 # ruby search.rb ./result-transpose オオサンショウウオ
