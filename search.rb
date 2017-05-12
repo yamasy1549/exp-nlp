@@ -1,4 +1,3 @@
-require 'pry'
 require 'csv'
 
 def search_or(search_words, dirname)

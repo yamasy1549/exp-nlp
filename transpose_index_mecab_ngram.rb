@@ -1,4 +1,3 @@
-require 'pry'
 require './tf_idf'
 
 pos = ["名詞", "動詞", "形容詞", "副詞", "感動詞"]
