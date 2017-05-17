@@ -1,13 +1,12 @@
 require './modules'
 require './tf_idf'
-require 'pry'
 
 using ArrayEx
 using HashEx
 using StringEx
 
-def compile_words(input_dir, word_table, source_files)
-  Dir.glob("#{input_dir}/**/*").each do |file_name|
+def compile_words(input_files, word_table, source_files)
+  input_files.each do |file_name|
     File.open(file_name) do |file|
       basename = File.basename(file)
       ngram = file.read.remove_url.remove_symbols.ngram(N.to_i)
@@ -16,14 +15,12 @@ def compile_words(input_dir, word_table, source_files)
       puts "#{basename} checked"
     end
   end
+  return word_table, source_files
 end
 
 N, INPUT_DIR, OUTPUT_DIR = ARGV
 
-word_table = {}
-source_files = {}
-
-compile_words(INPUT_DIR, word_table, source_files)
+word_table, source_files = compile_words(Dir.glob("#{INPUT_DIR}/**/*"), {}, {})
 
 word_table = Hash[word_table.sort]
 d_count = source_files.count

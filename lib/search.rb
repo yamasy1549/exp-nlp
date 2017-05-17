@@ -23,7 +23,7 @@ end
 
 def prioritize(files)
   file_tf_idf = {}
-  dirs = ['./result-character-removed', './result-word-removed']
+  dirs = ['../result-character-removed', '../result-word-removed']
 
   files.each do |data_file|
     dirs.each do |dir|
@@ -46,7 +46,7 @@ def prioritize(files)
   Hash[file_tf_idf.sort_by{ |_, v| -v }].map{ |k, _| k }
 end
 
-search_result = search_or(ARGV[1..-1], ARGV[0])
+# search_result = search_or(ARGV[1..-1], ARGV[0])
 search_result = search_and(ARGV[1..-1], ARGV[0])
 puts prioritize(search_result)
 

@@ -29,7 +29,7 @@ end
 module StringEx
   refine String do
     require 'uri'
-    require 'natto'
+    # require 'natto'
 
     def ngram(n)
       self.split('').each_cons(n).map(&:join)
@@ -46,9 +46,10 @@ module StringEx
     end
 
     def remove_symbols
-      nm = Natto::MeCab.new('-S%f[6] -F%f[0]')
-      words = nm.enum_parse(self).map { |n| n.surface if n.char_type != 3 }
-      words.compact.join('')
+      # nm = Natto::MeCab.new('-S%f[6] -F%f[0]')
+      # words = nm.enum_parse(self).map { |n| n.surface if n.char_type != 3 }
+      # words.compact.join('')
+      self.gsub(/[!"#$%&'()\*\+\-\.,\/:;<=>?@\[\\\]^_`{|}~「」（）！？"＃＄％＆’＝〜｜＿＜＞：；、。｀｛｝＋＊ー＾・…]/, '')
     end
   end
 end
