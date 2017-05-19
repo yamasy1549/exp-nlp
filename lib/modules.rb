@@ -29,7 +29,7 @@ end
 module StringEx
   refine String do
     require 'uri'
-    # require 'natto'
+    require 'natto'
 
     def ngram(n)
       self.split('').each_cons(n).map(&:join)

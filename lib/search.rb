@@ -46,8 +46,38 @@ def prioritize(files)
   Hash[file_tf_idf.sort_by{ |_, v| -v }].map{ |k, _| k }
 end
 
+def vec(file_name)
+  word_vec = {}
+  File.open(file_name) do |file|
+    file.read.split("\n").each do |word|
+      match = word.match(/(.*)\t(.*)/)
+      word_vec[match[1]] = match[2].to_f
+    end
+  end
+  word_vec
+end
+
+def similarity(a, b)
+  sim = 0
+  a.each do |k, v|
+    sim += v * b[k] if b[k]
+  end
+  sim
+end
+
 # search_result = search_or(ARGV[1..-1], ARGV[0])
 search_result = search_and(ARGV[1..-1], ARGV[0])
-puts prioritize(search_result)
+puts "TF-IDF MAX: #{search_result[0]}"
+
+most_priority_vec = vec("../result-word-removed/#{prioritize(search_result)[0]}-1gram")
+similarity_files = {}
+dir = '../result-word-removed'
+Dir.open(dir).each do |file_name|
+  next unless file_name =~ /(.*)-1gram/
+  vec = vec("../result-word-removed/#{file_name}")
+  similarity_files[file_name] = similarity(vec, most_priority_vec)
+end
+puts "sims:"
+puts Hash[similarity_files.sort_by{|_, v| -v}].map{|k,_| k}[1..10]
 
 # ruby search.rb ./result-transpose オオサンショウウオ
