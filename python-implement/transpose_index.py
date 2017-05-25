@@ -7,7 +7,7 @@ from functions import *
 
 token_table = defaultdict(list)
 
-for file_name in glob.glob(sys.argv[2] + sys.argv[1] + 'gram*'):
+for file_name in glob.glob(sys.argv[3] + sys.argv[1] + 'gram*'):
     basename = os.path.basename(file_name)
     for text in open(file_name).readlines():
         match = re.match(r"(.*)\t(.*)\n", text)
