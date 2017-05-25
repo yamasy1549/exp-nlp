@@ -26,4 +26,4 @@ for basename, token_count in file_token_count.items():
             f.writelines(token + "\t" + str(tf_idf(count[basename], token_count, document_count, len(count))) + "\n")
     f.close()
 
-# py mecab_ngram.py 2 ./data/ ./result-word/
+# py mecab_ngram.py 2 ../data/ ../result-word/
