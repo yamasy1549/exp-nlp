@@ -1,6 +1,11 @@
+require './modules'
 require './tf_idf'
 
-word_table = WordsTable.new
+using ArrayEx
+using HashEx
+using StringEx
+
+word_table = {}
 source_files = {}
 
 Dir.open(ARGV[1]).each do |file_name|

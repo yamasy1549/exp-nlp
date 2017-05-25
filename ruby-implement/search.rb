@@ -62,7 +62,7 @@ def similarity(a, b)
   a.each do |k, v|
     sim += v * b[k] if b[k]
   end
-  sim
+  sim / (Math.sqrt(a.size) * Math.sqrt(b.size))
 end
 
 # search_result = search_or(ARGV[1..-1], ARGV[0])

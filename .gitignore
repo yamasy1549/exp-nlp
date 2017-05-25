@@ -1,2 +1,4 @@
-result-*
-test
+__*
+test*
+result*
+.DS_Store
