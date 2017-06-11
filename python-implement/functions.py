@@ -40,7 +40,7 @@ def remove_url(text):
 def remove_symbols(text):
     return re.sub(r'[\n\r!"#$%&\'()\*\+\-\.,\/:;<=>?@\[\\\]^_`{\|}~「」【】『』〈〉《》〔〕〘〙（）！？"＃＄％＆’＝〜｜＿＜＞：；、。\｀｛｝＋＊＾・…　 ]', '', text)
 
-def tf_idf_of(word, basename, tf_idf_dir=['../result-word/', '../result-character/']):
+def tf_idf_of(word, basename, tf_idf_dir=['./result-word/', './result-character/']):
     tf_idf_files = [
         tf_idf_dir[0] + '1gram-',
         tf_idf_dir[0] + '2gram-',
@@ -58,10 +58,8 @@ def prioritize(words, files):
     for file_name in files:
         basename = os.path.basename(file_name)
         for word in words:
-            #  word_tf_idf = tf_idf_of(word, basename, tf_idf_dir=['../data-word/', '../data-character/'])
             word_tf_idf = tf_idf_of(word, basename)
             if word_tf_idf: priority[basename] += word_tf_idf
-        #  defaultdict(lambda:0, {basename: (lambda s: s[str(n)] + tf_idf_of(word, basename)) for word in words}) みたいに書きたい
     return sorted(priority.items(), key=lambda x:-x[1])
 
 def search(word, transpose_files):
@@ -88,19 +86,23 @@ def and_search(search_words, transpose_files):
         results = search(word, transpose_files) if not len(results) else results & search(word, transpose_files)
     return prioritize(search_words, results)
 
-def display_result(most_proper_file_name, ngram_dir='../result-word/'):
+def sort_by_simcos(most_proper_file_name, files, threshold=0.02, ngram_dir='./result-word/'):
     vec_a = {}
     for line in open(ngram_dir + '1gram-' + most_proper_file_name).readlines():
         match = re.match(r"(.*)\t(.*)", line)
         vec_a[match.group(1)] = float(match.group(2))
 
     files_with_simcos = {}
-    for file_name in glob.glob(ngram_dir + '1gram-*'):
+    for f in files:
+        file_name = ngram_dir + '1gram-' + f
         vec_b = {}
         for line in open(file_name).readlines():
             match = re.match(r"(.*)\t(.*)", line)
             vec_b[match.group(1)] = float(match.group(2))
         files_with_simcos[file_name] = simcos(vec_a, vec_b)
 
-    for file_name, simcos_value in sorted(files_with_simcos.items(), key=lambda x:-x[1])[0:10]:
-        print(file_name + ' ' + str(simcos_value))
+    return list(sorted(filter(lambda x:x[1]>threshold, files_with_simcos.items()), key=lambda x:-x[1]))
+
+def display_result(results):
+    for r in sort_by_simcos(results[0][0], [r[0] for r in results]):
+        print(r[0] + ": " + str(r[1]))

@@ -15,11 +15,9 @@ search_words = sys.argv[2:]
 if isinstance(search_words, str): search_words = [search_words]
 
 print("OR")
-#  display_result(or_search(search_words, transpose_files)[0][0], ngram_dir='../data-word/')
-display_result(or_search(search_words, transpose_files)[0][0])
+display_result(or_search(search_words, transpose_files))
 print("AND")
-#  display_result(and_search(search_words, transpose_files)[0][0], ngram_dir='../data-word/')
-display_result(and_search(search_words, transpose_files)[0][0])
+display_result(and_search(search_words, transpose_files))
 
-# py search.py ../result-transpose/ オオサンショウウオ
-# py search.py ../result-transpose/ 広島 大阪
+# py search.py ./result-transpose/ オオサンショウウオ
+# py search.py ./result-transpose/ 広島 大阪

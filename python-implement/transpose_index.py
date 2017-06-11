@@ -16,5 +16,5 @@ f = open(sys.argv[4] + sys.argv[2] + '-' + sys.argv[1] + 'gram.txt', 'w')
 [f.writelines(token + "\t" + ','.join(files) + "\n") for token, files in token_table.items()]
 f.close()
 
-# py transpose_index_ngram.py 2 character ../result-character/ ../result-transpose/
-# py transpose_index_ngram.py 2 word ../result-word/ ../result-transpose/
+# py transpose_index_ngram.py 2 character ./result-character/ ./result-transpose/
+# py transpose_index_ngram.py 2 word ./result-word/ ./result-transpose/
